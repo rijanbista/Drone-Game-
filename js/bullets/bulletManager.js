@@ -118,7 +118,6 @@ export function createBulletManager(scene) {
             if (oflatDist >= bullet.blastRadius + (obs.halfW || 6)) continue;
 
             obs.health = (obs.health === undefined ? 20 : obs.health) - bullet.damage;
-            anythingHit = true;
             
             if (obs.health <= 0 && obs.mesh.parent) {
               obs.mesh.parent.remove(obs.mesh);

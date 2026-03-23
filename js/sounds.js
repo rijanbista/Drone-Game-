@@ -2,6 +2,8 @@ let audioContext = null;
 let lastExplosionTime = 0;
 let lastJammerTime = 0;
 let ambientStarted = false;
+let hoverOsc = null;
+let hoverGain = null;
 
 function getAudioContext() {
   if (!audioContext) {
@@ -244,4 +246,64 @@ export function playJammerSound() {
   gain.connect(ctx.destination);
   osc.start();
   osc.stop(ctx.currentTime + 0.05);
+}
+
+export function startHoverSound() {
+  const ctx = getAudioContext();
+  if (hoverOsc) return; // already playing
+  if (ctx.state === "suspended") ctx.resume();
+
+  hoverOsc = ctx.createOscillator();
+  hoverOsc.type = "sawtooth";
+  hoverOsc.frequency.setValueAtTime(60, ctx.currentTime);
+
+  // modulate frequency slightly for drone effect
+  const lfo = ctx.createOscillator();
+  lfo.type = "sine";
+  lfo.frequency.value = 5; // 5Hz wobble
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 2; // +/- 2Hz
+  lfo.connect(lfoGain);
+  lfoGain.connect(hoverOsc.frequency);
+  lfo.start();
+
+  hoverGain = ctx.createGain();
+  hoverGain.gain.setValueAtTime(0, ctx.currentTime);
+  hoverGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.5); // fade in
+
+  // lowpass filter to muffle
+  const filter = ctx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 150;
+
+  hoverOsc.connect(filter);
+  filter.connect(hoverGain);
+  hoverGain.connect(ctx.destination);
+
+  hoverOsc.start();
+  
+  // store lfo on osc to stop it later
+  hoverOsc.lfo = lfo;
+}
+
+export function stopHoverSound() {
+  if (!hoverOsc) return;
+  const ctx = getAudioContext();
+  
+  // fade out
+  hoverGain.gain.cancelScheduledValues(ctx.currentTime);
+  hoverGain.gain.setValueAtTime(hoverGain.gain.value, ctx.currentTime);
+  hoverGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+
+  const oscToStop = hoverOsc;
+  const lfoToStop = hoverOsc.lfo;
+  hoverOsc = null;
+  hoverGain = null;
+
+  setTimeout(() => {
+    try {
+      oscToStop.stop();
+      if (lfoToStop) lfoToStop.stop();
+    } catch (e) {}
+  }, 300);
 }

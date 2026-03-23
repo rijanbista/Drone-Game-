@@ -1,15 +1,24 @@
 export function setupInput(state) {
+  state.lastActionTime = performance.now();
+  
   window.addEventListener("keydown", (e) => {
+    state.lastActionTime = performance.now();
     state.keys[e.key.toLowerCase()] = true;
   });
 
   window.addEventListener("keyup", (e) => {
+    state.lastActionTime = performance.now();
     state.keys[e.key.toLowerCase()] = false;
   });
 
   window.addEventListener("mousemove", (e) => {
+    state.lastActionTime = performance.now();
     state.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     state.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  window.addEventListener("mousedown", () => {
+    state.lastActionTime = performance.now();
   });
 
   const joystickZone = document.getElementById("joystick-zone");
@@ -37,6 +46,7 @@ export function setupInput(state) {
 
     joystickZone.addEventListener("touchstart", (e) => {
       e.preventDefault();
+      state.lastActionTime = performance.now();
       joystickActive = true;
       state.joystick.active = true;
       const rect = joystickZone.getBoundingClientRect();
@@ -47,6 +57,7 @@ export function setupInput(state) {
 
     joystickZone.addEventListener("touchmove", (e) => {
       e.preventDefault();
+      state.lastActionTime = performance.now();
       if (joystickActive) {
         updateJoystick(e.touches[0]);
       }
@@ -54,6 +65,7 @@ export function setupInput(state) {
 
     const endJoystick = (e) => {
       e.preventDefault();
+      state.lastActionTime = performance.now();
       joystickActive = false;
       state.joystick.active = false;
       state.joystick.x = 0;

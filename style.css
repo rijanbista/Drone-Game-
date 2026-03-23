@@ -213,18 +213,6 @@ body {
   font-size: 14px;
 }
 
-.fire-btn {
-  width: 80px;
-  height: 80px;
-  background: rgba(220, 50, 50, 0.7);
-  border-color: rgba(255, 100, 100, 0.8);
-  font-size: 20px;
-}
-
-.fire-btn:active, .fire-btn.active-touch {
-  background: rgba(255, 80, 80, 0.9);
-}
-
 @media (pointer: coarse) {
   #mobile-controls {
     display: flex;

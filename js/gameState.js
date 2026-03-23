@@ -3,7 +3,7 @@ import { createWeaponSystem } from "./weapons.js";
 export function createGameState() {
   return {
     health: 100,
-    money: 200,
+    money: 500,
     score: 0,
     wave: 1,
     objectiveText: "",
