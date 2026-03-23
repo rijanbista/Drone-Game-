@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drone Game</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <div id="minimap">
+  <canvas id="minimapCanvas"></canvas>
+  </div>
+
+  <!-- UI ROOT -->
+   
+  <div id="ui">
+    <div>Allies: <span id="allyStatus">Ready</span></div>
+    <div>Health: <span id="health">100</span></div>
+    <div>Coins: <span id="money">200</span></div>
+    <div>Score: <span id="score">0</span></div>
+    <div>Wave: <span id="wave">1</span></div>
+    <div>Enemies Left: <span id="enemyCount">0</span></div>
+    <div>Objective: <span id="objective">Eliminate all infantry</span></div>
+    <div>Status: <span id="statusText">Normal</span></div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOver" style="display:none;">
+    <h1>Game Over</h1>
+    <button onclick="location.reload()">Restart</button>
+  </div>
+
+  <div id="gameOverScreen">
+  <div>GAME OVER</div>
+  <div id="finalScoreText">Score: 0</div>
+  <button onclick="location.reload()">Restart</button>
+</div>
+
+  <!-- MOBILE CONTROLS -->
+  <div id="mobile-controls">
+    <div id="joystick-zone">
+      <div id="joystick-thumb"></div>
+    </div>
+    <div id="mobile-actions">
+      <div class="mobile-weapons">
+        <button id="btn-small" class="mobile-btn weapon-btn active">1</button>
+        <button id="btn-big" class="mobile-btn weapon-btn">2</button>
+        <button id="btn-nuke" class="mobile-btn weapon-btn">3</button>
+      </div>
+      <div class="mobile-utility">
+        <button id="btn-zoom" class="mobile-btn utility-btn">Zoom</button>
+        <button id="btn-ally" class="mobile-btn utility-btn">Ally</button>
+      </div>
+      <button id="btn-fire" class="mobile-btn fire-btn">FIRE</button>
+    </div>
+  </div>
+
+<div id="overlay"></div>
+
+  <!-- MAIN SCRIPT -->
+   <div id="feedNoise"></div>
+  <script type="module" src="./js/main.js"></script>
+
+</body>
+</html>
