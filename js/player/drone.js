@@ -1,6 +1,7 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { CONFIG } from "../config.js";
 
-const MAP_HALF = 300;
+const MAP_HALF = CONFIG.MAP_HALF;
 
 export function createDrone(scene) {
   const group = new THREE.Group();
@@ -87,18 +88,18 @@ export function createDrone(scene) {
   sensor.position.set(0, -0.28, -2.6);
   group.add(sensor);
 
-  group.position.set(0, 28, 0);
-  group.scale.set(0.55, 0.55, 0.55);
+  group.position.set(0, CONFIG.DRONE.START_Y, 0);
+  group.scale.set(CONFIG.DRONE.SCALE, CONFIG.DRONE.SCALE, CONFIG.DRONE.SCALE);
   scene.add(group);
 
   return {
     mesh: group,
-    speed: 28,
-    hitRadius: 1.8
+    speed: CONFIG.DRONE.SPEED,
+    hitRadius: CONFIG.DRONE.HIT_RADIUS
   };
 }
 
-export function updateDrone(drone, input, camera, delta) {
+export function updateDrone(drone, input, camera, delta, world = null) {
   const move = new THREE.Vector3();
 
   if (input.keys["w"]) move.z -= 1;
@@ -113,11 +114,41 @@ export function updateDrone(drone, input, camera, delta) {
 
   if (move.length() > 0) {
     move.normalize().multiplyScalar(drone.speed * delta);
-    drone.mesh.position.add(move);
+    
+    const nextPos = drone.mesh.position.clone().add(move);
+    
+    // Collision detection with world obstacles (buildings, etc.)
+    let canMove = true;
+    if (world && world.getNearbyObstacles) {
+      const nearby = world.getNearbyObstacles(nextPos.x, nextPos.z, 15);
+      for (const obs of nearby) {
+        if (!obs.mesh) continue;
+        
+        // Check if the drone is below the building's top
+        // Assuming building height is at obs.mesh.scale.y or similar.
+        // Let's use a safe threshold for the drone's height.
+        const buildingHeight = obs.height || (obs.mesh.geometry ? obs.mesh.geometry.parameters.height : 20);
+        
+        if (drone.mesh.position.y < buildingHeight + 2) {
+           const dx = nextPos.x - obs.x;
+           const dz = nextPos.z - obs.z;
+           const dist = Math.hypot(dx, dz);
+           if (dist < (obs.halfW || 6) + drone.hitRadius + 1) {
+             canMove = false;
+             break;
+           }
+        }
+      }
+    }
+    
+    if (canMove) {
+      drone.mesh.position.add(move);
+    }
   }
 
-  drone.mesh.position.x = THREE.MathUtils.clamp(drone.mesh.position.x, -MAP_HALF, MAP_HALF);
-  drone.mesh.position.z = THREE.MathUtils.clamp(drone.mesh.position.z, -MAP_HALF, MAP_HALF);
+  const currentMapHalf = CONFIG.MAP_HALF;
+  drone.mesh.position.x = THREE.MathUtils.clamp(drone.mesh.position.x, -currentMapHalf, currentMapHalf);
+  drone.mesh.position.z = THREE.MathUtils.clamp(drone.mesh.position.z, -currentMapHalf, currentMapHalf);
 
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(input.mouse.x, input.mouse.y), camera);

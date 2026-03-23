@@ -1,4 +1,5 @@
 import { createWeaponSystem } from "./weapons.js";
+import { CONFIG } from "./config.js";
 
 export function createGameState() {
   return {
@@ -22,8 +23,15 @@ export function createGameState() {
     allyCost: 200,
     allyUsedThisWave: false,
 
+    difficulty: "medium", // Default
+    difficultyMultiplier: 1.0,
+
+    isPaused: false,
+    inMenu: true,
+    screenShake: 0,
+
     zoomMode: false,
-    cameraHeight: 70,
-    cameraOffsetZ: 18
+    cameraHeight: CONFIG.CAMERA.DEFAULT_HEIGHT,
+    cameraOffsetZ: CONFIG.CAMERA.DEFAULT_OFFSET_Z
   };
 }

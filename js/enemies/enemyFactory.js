@@ -6,7 +6,7 @@ import { createTank } from "./tank.js";
 import { createChopper } from "./chopper.js";
 import { applyWeakspots } from "./weakspots.js";
 
-export function createEnemy(type, x, z) {
+export function createEnemy(type, x, z, wave = 1, difficultyMultiplier = 1.0) {
   let enemy = null;
 
   if (type === "infantry") enemy = createInfantry(x, z);
@@ -19,6 +19,20 @@ export function createEnemy(type, x, z) {
   if (!enemy) {
     throw new Error(`Unknown enemy type: ${type}`);
   }
+
+  // Apply difficulty and wave scaling
+  const baseScale = difficultyMultiplier;
+  const waveScale = 1 + (wave - 1) * 0.15;
+  const totalHealthScale = baseScale * waveScale;
+  
+  enemy.health *= totalHealthScale;
+  enemy.maxHealth *= totalHealthScale;
+  
+  // Speed scales less aggressively
+  enemy.speed *= (1 + (baseScale - 1) * 0.5) * (1 + (wave - 1) * 0.05);
+  
+  // Damage scales with difficulty and wave
+  enemy.damage *= baseScale * (1 + (wave - 1) * 0.1);
 
   return applyWeakspots(enemy);
 }

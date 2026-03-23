@@ -1,13 +1,15 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-export function createRock(x, z) {
-  const mesh = new THREE.Mesh(
-    new THREE.DodecahedronGeometry(0.9 + Math.random() * 0.6),
-    new THREE.MeshStandardMaterial({ color: 0x666b69, roughness: 0.9, metalness: 0.2 })
-  );
+const rockGeometry = new THREE.DodecahedronGeometry(1);
+const rockMaterial = new THREE.MeshStandardMaterial({ color: 0x666b69, roughness: 0.9, metalness: 0.2 });
 
-  mesh.position.set(x, 0.7, z);
-  mesh.scale.set(1.2, 0.8, 1.0);
+export function createRock(x, z) {
+  const mesh = new THREE.Mesh(rockGeometry, rockMaterial);
+  const size = 0.9 + Math.random() * 0.6;
+  mesh.scale.set(size * 1.2, size * 0.8, size * 1.0);
+  mesh.rotation.set(Math.random(), Math.random(), Math.random());
+  
+  mesh.position.set(x, size * 0.4, z);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
 

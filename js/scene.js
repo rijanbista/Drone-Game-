@@ -1,4 +1,5 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { CONFIG } from "./config.js";
 
 export function createScene() {
   const scene = new THREE.Scene();
@@ -28,20 +29,38 @@ export function createScene() {
   hemiLight.position.set(0, 200, 0);
   scene.add(hemiLight);
 
-  const light = new THREE.DirectionalLight(0xfffee0, 1.8);
-  light.position.set(120, 180, 80);
+  const light = new THREE.DirectionalLight(0xfffee0, 2.2);
+  light.position.set(200, 300, 150);
   light.castShadow = true;
   light.shadow.mapSize.width = 2048;
   light.shadow.mapSize.height = 2048;
   light.shadow.camera.near = 0.5;
-  light.shadow.camera.far = 500;
-  const d = 250;
+  light.shadow.camera.far = 1000;
+  const d = 300;
   light.shadow.camera.left = -d;
   light.shadow.camera.right = d;
   light.shadow.camera.top = d;
   light.shadow.camera.bottom = -d;
-  light.shadow.bias = -0.0005;
+  light.shadow.bias = -0.0001;
   scene.add(light);
+
+  // Visual Sun
+  const sunGeometry = new THREE.SphereGeometry(25, 32, 32);
+  const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffffee });
+  const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+  sun.position.set(400, 500, 300);
+  scene.add(sun);
+
+  // Add a glow to the sun
+  const sunGlowGeometry = new THREE.SphereGeometry(45, 32, 32);
+  const sunGlowMaterial = new THREE.MeshBasicMaterial({ 
+    color: 0xffeebb, 
+    transparent: true, 
+    opacity: 0.3 
+  });
+  const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+  sunGlow.position.copy(sun.position);
+  scene.add(sunGlow);
 
   const groundMaterial = new THREE.MeshStandardMaterial({ 
     vertexColors: true,
@@ -50,7 +69,7 @@ export function createScene() {
   });
 
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(800, 800, 60, 60),
+    new THREE.PlaneGeometry(CONFIG.MAP_SIZE * 1.2, CONFIG.MAP_SIZE * 1.2, 80, 80),
     groundMaterial
   );
   
@@ -78,7 +97,7 @@ export function createScene() {
     } else {
       baseColor.lerpColors(colorMid, colorHigh, (normalizedNoise - 0.5) / 0.5);
     }
-    
+
     baseColor.r += (Math.random() - 0.5) * 0.02;
     baseColor.g += (Math.random() - 0.5) * 0.02;
     baseColor.b += (Math.random() - 0.5) * 0.02;
@@ -123,12 +142,12 @@ export function createScene() {
   });
 
   const roadsData = [
-    { w: 28, l: 800, x: -90, z: 0, rot: 0 },
-    { w: 32, l: 800, x: 140, z: 0, rot: 0 },
-    { w: 24, l: 800, x: -250, z: 0, rot: 0 },
-    { w: 26, l: 800, x: 0, z: -100, rot: Math.PI / 2 },
-    { w: 30, l: 800, x: 0, z: 180, rot: Math.PI / 2 },
-    { w: 20, l: 800, x: 0, z: -300, rot: Math.PI / 2 }
+    { w: 28, l: 1200, x: -90, z: 0, rot: 0 },
+    { w: 32, l: 1200, x: 140, z: 0, rot: 0 },
+    { w: 24, l: 1200, x: -250, z: 0, rot: 0 },
+    { w: 26, l: 1200, x: 0, z: -100, rot: Math.PI / 2 },
+    { w: 30, l: 1200, x: 0, z: 180, rot: Math.PI / 2 },
+    { w: 20, l: 1200, x: 0, z: -300, rot: Math.PI / 2 }
   ];
 
   roadsData.forEach(r => {
@@ -146,5 +165,5 @@ export function createScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  return { scene, camera, renderer };
+  return { scene, camera, renderer, ground };
 }

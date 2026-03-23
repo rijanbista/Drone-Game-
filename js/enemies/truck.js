@@ -103,8 +103,8 @@ export function createTruck(x, z) {
     type: "truck",
     mesh: group,
 
-    health: 5,
-    maxHealth: 5,
+    health: 4,
+    maxHealth: 4,
 
     speed: 1.35,
     attackRange: 36,

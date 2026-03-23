@@ -1,17 +1,19 @@
 export function createWeaponSystem() {
   return {
     current: "small",
+    isReloading: false,
+    reloadTimer: 0,
 
     ammo: {
-      small: { count: Infinity, reload: 0.2, cooldown: 0 },
-      big: { count: Infinity, reload: 0.6, cooldown: 0 },
-      nuke: { count: 1, reload: 3, cooldown: 0 }
+      small: { count: Infinity, reloadTime: 0.15, cooldown: 0 },
+      big: { count: Infinity, reloadTime: 0.8, cooldown: 0 },
+      nuke: { count: 1, reloadTime: 4.0, cooldown: 0 }
     },
 
     cost: {
-      small: 5,
-      big: 10,
-      nuke: 50
+      small: 8,
+      big: 25,
+      nuke: 120
     }
   };
 }

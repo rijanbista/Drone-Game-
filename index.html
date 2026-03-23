@@ -9,6 +9,45 @@
 </head>
 <body>
 
+  <div id="loading-screen">
+    <div id="loading-text">Initializing Systems... 0%</div>
+    <div id="loading-bar-container">
+      <div id="loading-bar"></div>
+    </div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="main-menu" class="menu-overlay">
+    <div class="menu-content">
+      <h1>DRONE STRIKE</h1>
+      <p>COMMAND & CONTROL INTERFACE</p>
+      
+      <div class="difficulty-selection">
+        <p>SELECT MISSION INTENSITY:</p>
+        <button class="difficulty-btn" data-level="easy">EASY</button>
+        <button class="difficulty-btn active" data-level="medium">MEDIUM</button>
+        <button class="difficulty-btn" data-level="hard">HARD</button>
+      </div>
+
+      <button id="btn-start" class="menu-btn">ENGAGE MISSION</button>
+      <div class="menu-hint">
+        WASD to Move | Mouse to Aim & Fire<br>
+        1, 2, 3 to Switch Weapons | E for Allies
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE SCREEN -->
+  <div id="pause-screen" class="menu-overlay" style="display:none;">
+    <div class="menu-content">
+      <h2>MISSION PAUSED</h2>
+      <button id="btn-resume" class="menu-btn">RESUME MISSION</button>
+      <button onclick="location.reload()" class="menu-btn secondary">ABORT MISSION</button>
+    </div>
+  </div>
+
+  <div id="crosshair"></div>
+
   <div id="minimap">
   <canvas id="minimapCanvas"></canvas>
   </div>

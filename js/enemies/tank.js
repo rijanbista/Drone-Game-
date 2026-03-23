@@ -102,8 +102,8 @@ export function createTank(x, z) {
     attackRange: 48,
     damage: 5,
 
-    scoreValue: 28,
-    rewardValue: 50,
+    scoreValue: 60,
+    rewardValue: 80,
 
     passengers: 2,
     bailThreshold: 3,

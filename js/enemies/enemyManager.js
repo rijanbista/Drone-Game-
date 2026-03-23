@@ -2,13 +2,23 @@ import { createEnemy } from "./enemyFactory.js";
 
 export function createEnemyManager(scene) {
   const enemies = [];
+  let currentWave = 1;
+  let currentDifficultyMultiplier = 1.0;
 
   function spawnEnemy(type, x, z) {
-    const enemy = createEnemy(type, x, z);
+    const enemy = createEnemy(type, x, z, currentWave, currentDifficultyMultiplier);
     enemy.shootCooldown = 1 + Math.random() * 1.5;
     scene.add(enemy.mesh);
     enemies.push(enemy);
     return enemy;
+  }
+
+  function setCurrentWave(wave) {
+    currentWave = wave;
+  }
+
+  function setDifficultyMultiplier(mult) {
+    currentDifficultyMultiplier = mult;
   }
 
   function randomPosition(minDist = 70) {
@@ -116,7 +126,7 @@ export function createEnemyManager(scene) {
     return true;
   }
 
-  function updateEnemies(drone, delta, now = performance.now(), enemyBulletManager = null, worldObstacles = []) {
+  function updateEnemies(drone, delta, wave = 1, now = performance.now(), enemyBulletManager = null, worldObstacles = []) {
     for (let i = 0; i < enemies.length; i++) {
       const enemy = enemies[i];
       if (!enemy || !enemy.mesh) continue;
@@ -144,8 +154,8 @@ export function createEnemyManager(scene) {
       }
 
       if (enemy.alerted && dist > 1) {
-        // Tactical Cover Sensing for Infantry
-        if ((enemy.type === "infantry" || enemy.type === "jeep") && worldObstacles.length > 0) {
+        // Tactical Cover Sensing for Infantry/Jeeps: ONLY AFTER WAVE 15
+        if (wave > 15 && (enemy.type === "infantry" || enemy.type === "jeep") && worldObstacles.length > 0) {
           let nearestObs = null;
           let minDistToObs = Infinity;
           for (let oi = 0; oi < worldObstacles.length; oi++) {
@@ -213,7 +223,9 @@ export function createEnemyManager(scene) {
         const target = drone.mesh.position.clone();
         target.y = 33;
 
-        enemyBulletManager.fireEnemyBullet(start, target, enemy.damage);
+        // Damage scales with wave: base + (wave-1) * 20%
+        const scaledDamage = enemy.damage * (1 + (wave - 1) * 0.2);
+        enemyBulletManager.fireEnemyBullet(start, target, scaledDamage);
         enemy.shootCooldown = 1.2 + Math.random() * 1.5;
       }
     }
@@ -273,6 +285,8 @@ export function createEnemyManager(scene) {
     damageEnemy,
     isJammerActive,
     removeEnemy,
-    clearEnemies
+    clearEnemies,
+    setCurrentWave,
+    setDifficultyMultiplier
   };
 }

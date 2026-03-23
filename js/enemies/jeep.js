@@ -65,15 +65,15 @@ export function createJeep(x, z) {
     type: "jeep",
     mesh: group,
 
-    health: 4,
-    maxHealth: 4,
+    health: 3,
+    maxHealth: 3,
 
     speed: 2.8,
     attackRange: 40,
     damage: 3,
 
-    scoreValue: 15,
-    rewardValue: 15,
+    scoreValue: 25,
+    rewardValue: 30,
 
     alerted: false,
     visionRange: 45,

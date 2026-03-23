@@ -1,5 +1,7 @@
-const MAP_SIZE = 640;
-const MAP_HALF = MAP_SIZE / 2;
+import { CONFIG } from "./config.js";
+
+const MAP_SIZE = CONFIG.MAP_SIZE;
+const MAP_HALF = CONFIG.MAP_HALF;
 
 export function createMinimap() {
   const canvas = document.getElementById("minimapCanvas");

@@ -120,8 +120,8 @@ export function createChopper(x, z) {
     attackRange: 42,
     damage: 4,
 
-    scoreValue: 24,
-    rewardValue: 30,
+    scoreValue: 50,
+    rewardValue: 60,
 
     alerted: false,
     visionRange: 70,

@@ -10,34 +10,54 @@ export function createExplosion(scene, position, size = 2, color = 0xff8844) {
     roughness: 1.0
   });
 
-  const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(size, 8, 8),
-    material
-  );
+  const geometry = new THREE.SphereGeometry(1, 8, 8);
+  const mesh = new THREE.Mesh(geometry, material);
 
   mesh.position.copy(position);
+  mesh.scale.set(size, size, size);
   scene.add(mesh);
 
   let life = 0.25;
 
-  return {
+  const explosion = {
+    mesh,
+    material,
+    life,
+    baseSize: size,
+
+    reset(scene, position, size = 2, color = 0xff8844) {
+      this.mesh.position.copy(position);
+      this.mesh.scale.set(size, size, size);
+      this.material.emissive.setHex(color);
+      this.material.opacity = 0.85;
+      this.life = 0.25;
+      this.baseSize = size;
+      this.mesh.visible = true;
+      if (!this.mesh.parent) scene.add(this.mesh);
+    },
+
+    onRelease() {
+      this.mesh.visible = false;
+      if (this.mesh.parent) this.mesh.parent.remove(this.mesh);
+    },
+
     update(delta) {
-      life -= delta;
+      this.life -= delta;
 
-      mesh.scale.x += delta * 4;
-      mesh.scale.y += delta * 4;
-      mesh.scale.z += delta * 4;
+      const scaleAdd = delta * 4;
+      this.mesh.scale.x += scaleAdd;
+      this.mesh.scale.y += scaleAdd;
+      this.mesh.scale.z += scaleAdd;
 
-      material.opacity = Math.max(0, life * 2.5);
+      this.material.opacity = Math.max(0, this.life * 2.5);
 
-      if (life <= 0) {
-        scene.remove(mesh);
-        material.dispose();
-        mesh.geometry.dispose();
+      if (this.life <= 0) {
         return false;
       }
 
       return true;
     }
   };
+
+  return explosion;
 }

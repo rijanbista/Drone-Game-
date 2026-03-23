@@ -1,6 +1,5 @@
-import { createPlayerBullet } from "./playerBullet.js";
+import { poolManager } from "../poolManager.js";
 import { showHit } from "../ui/hitPopup.js";
-import { createExplosion } from "../effects/explosion.js";
 
 export function createBulletManager(scene) {
   const bullets = [];
@@ -8,10 +7,12 @@ export function createBulletManager(scene) {
   const explosions = [];
   const MAX_BULLETS = 80;
 
+  poolManager.init(scene);
+
   function firePlayerBullet(startPosition, targetPosition, type = "small", isAlly = false) {
     if (bullets.length >= MAX_BULLETS) return;
 
-    const bullet = createPlayerBullet(
+    const bullet = poolManager.bulletPool.get(
       scene,
       startPosition,
       targetPosition,
@@ -44,7 +45,7 @@ export function createBulletManager(scene) {
         const impactPos = bullet.mesh.position.clone();
 
         explosions.push(
-          createExplosion(
+          poolManager.explosionPool.get(
             scene,
             impactPos,
             bullet.type === "nuke" ? 4.2 : bullet.type === "big" ? 2.8 : 1.8,
@@ -55,6 +56,9 @@ export function createBulletManager(scene) {
               : 0xff8844
           )
         );
+
+        // Screen Shake
+        gameState.screenShake = bullet.type === "nuke" ? 0.7 : bullet.type === "big" ? 0.35 : 0.18;
 
         let anythingHit = false;
         let killedSomething = false;
@@ -106,10 +110,11 @@ export function createBulletManager(scene) {
           }
         }
 
-        if (world && world.obstacles) {
-          for (let oi = world.obstacles.length - 1; oi >= 0; oi--) {
-            const obs = world.obstacles[oi];
-            if (!obs.mesh || obs.type !== "building") continue;
+        if (world && world.getNearbyObstacles) {
+          const nearby = world.getNearbyObstacles(impactPos.x, impactPos.z, bullet.blastRadius + 20);
+          for (let oi = nearby.length - 1; oi >= 0; oi--) {
+            const obs = nearby[oi];
+            if (!obs.mesh || obs.type !== "tent") continue;
 
             const odx = impactPos.x - obs.x;
             const odz = impactPos.z - obs.z;
@@ -118,10 +123,16 @@ export function createBulletManager(scene) {
             if (oflatDist >= bullet.blastRadius + (obs.halfW || 6)) continue;
 
             obs.health = (obs.health === undefined ? 20 : obs.health) - bullet.damage;
+<<<<<<< HEAD
+=======
+            anythingHit = true;
+
+            // Show HP popup for tents
+            if (obs.updateHPBar) obs.updateHPBar();
+>>>>>>> ed10bdb (v1)
             
-            if (obs.health <= 0 && obs.mesh.parent) {
-              obs.mesh.parent.remove(obs.mesh);
-              world.obstacles.splice(oi, 1);
+            if (obs.health <= 0) {
+              world.removeObstacle(obs);
             }
           }
         }
@@ -148,8 +159,7 @@ export function createBulletManager(scene) {
         }
 
         if (bullet.mesh) {
-          scene.remove(bullet.mesh);
-          bullet.mesh = null;
+          poolManager.bulletPool.release(bullet);
         }
 
         bullets.splice(i, 1);
@@ -157,12 +167,20 @@ export function createBulletManager(scene) {
       }
 
       direction.normalize();
-      bullet.mesh.position.add(direction.multiplyScalar(bullet.speed * delta));
+      const move = direction.clone().multiplyScalar(bullet.speed * delta);
+      bullet.mesh.position.add(move);
+      
+      // Look straight at target (trajectory alignment)
+      bullet.mesh.lookAt(bullet.target);
+      bullet.mesh.rotateX(Math.PI / 2);
     }
 
     for (let i = explosions.length - 1; i >= 0; i--) {
       const alive = explosions[i].update(delta);
-      if (!alive) explosions.splice(i, 1);
+      if (!alive) {
+        poolManager.explosionPool.release(explosions[i]);
+        explosions.splice(i, 1);
+      }
     }
 
     for (let i = popups.length - 1; i >= 0; i--) {
