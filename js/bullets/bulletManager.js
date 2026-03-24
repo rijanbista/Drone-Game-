@@ -123,13 +123,10 @@ export function createBulletManager(scene) {
             if (oflatDist >= bullet.blastRadius + (obs.halfW || 6)) continue;
 
             obs.health = (obs.health === undefined ? 20 : obs.health) - bullet.damage;
-<<<<<<< HEAD
-=======
             anythingHit = true;
 
             // Show HP popup for tents
             if (obs.updateHPBar) obs.updateHPBar();
->>>>>>> ed10bdb (v1)
             
             if (obs.health <= 0) {
               world.removeObstacle(obs);

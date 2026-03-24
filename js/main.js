@@ -436,30 +436,6 @@ function gameLoop(now) {
   const delta = (now - clock.old) / 1000;
   clock.old = now;
 
-<<<<<<< HEAD
-  // Idle check
-  const isIdle = (now - gameState.lastActionTime) > 3000;
-  const idleReminderEl = document.getElementById("idleReminder");
-  const isMobile = window.matchMedia("(pointer: coarse)").matches;
-
-  if (isIdle) {
-    if (idleReminderEl) {
-      idleReminderEl.style.display = "block";
-      idleReminderEl.textContent = isMobile 
-        ? "use joystick to control and tap to fire"
-        : "aswd same and click to fire";
-    }
-    startHoverSound();
-  } else {
-    if (idleReminderEl) {
-      idleReminderEl.style.display = "none";
-    }
-    stopHoverSound();
-  }
-
-  updateDrone(drone, gameState, sceneData.camera, delta);
-  enemyManager.updateEnemies(drone, delta, now, enemyBulletManager, world.obstacles);
-=======
   updateDrone(drone, gameState, sceneData.camera, delta, world);
   
   // Weapon reload logic
@@ -472,7 +448,6 @@ function gameLoop(now) {
   }
 
   enemyManager.updateEnemies(drone, delta, gameState.wave, now, enemyBulletManager, world.obstacles);
->>>>>>> ed10bdb (v1)
   allySystem.update(
     delta,
     drone,
@@ -576,13 +551,7 @@ function gameLoop(now) {
     waveCooldownLeft = 5;
     waveCompleted = gameState.wave;
 
-<<<<<<< HEAD
-    // +1000 per completed wave as requested
     gameState.money += 1000;
-    gameState.score += 100;
-=======
-    gameState.money += 1000;
->>>>>>> ed10bdb (v1)
 
     playWaveClearSound();
     gameState.objectiveText = `WELL DONE! WAVE ${waveCompleted} COMPLETED`;

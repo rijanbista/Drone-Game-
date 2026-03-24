@@ -38,20 +38,6 @@ export function createWorld(scene) {
     addToGrid(obstacle);
   }
 
-<<<<<<< HEAD
-  function isOnRoad(x, z, margin = 5) {
-    const roads = [
-      { minX: -90 - 14 - margin, maxX: -90 + 14 + margin, minZ: -400, maxZ: 400 },
-      { minX: 140 - 16 - margin, maxX: 140 + 16 + margin, minZ: -400, maxZ: 400 },
-      { minX: -250 - 12 - margin, maxX: -250 + 12 + margin, minZ: -400, maxZ: 400 },
-      { minX: -400, maxX: 400, minZ: -100 - 13 - margin, maxZ: -100 + 13 + margin },
-      { minX: -400, maxX: 400, minZ: 180 - 15 - margin, maxZ: 180 + 15 + margin },
-      { minX: -400, maxX: 400, minZ: -300 - 10 - margin, maxZ: -300 + 10 + margin }
-    ];
-    for (const r of roads) {
-      if (x >= r.minX && x <= r.maxX && z >= r.minZ && z <= r.maxZ) {
-        return true;
-=======
   function isColliding(x, z, radius) {
     const gx = Math.floor(x / GRID_SIZE);
     const gz = Math.floor(z / GRID_SIZE);
@@ -67,43 +53,51 @@ export function createWorld(scene) {
           const dist = Math.hypot(dx, dz);
           if (dist < radius + (obs.halfW || 6)) return true;
         }
->>>>>>> ed10bdb (v1)
       }
     }
     return false;
   }
 
-<<<<<<< HEAD
-  function randomPoint(minCenter = 60, avoidRoads = false) {
-=======
-  function randomPoint(minCenter = 60, radius = 10) {
->>>>>>> ed10bdb (v1)
+  function isOnRoad(x, z, margin = 5) {
+    const span = CONFIG.SPAWN_LIMITS.WORLD_RANGE / 2;
+    const roads = [
+      { minX: -90 - 14 - margin, maxX: -90 + 14 + margin, minZ: -span, maxZ: span },
+      { minX: 140 - 16 - margin, maxX: 140 + 16 + margin, minZ: -span, maxZ: span },
+      { minX: -250 - 12 - margin, maxX: -250 + 12 + margin, minZ: -span, maxZ: span },
+      { minX: -span, maxX: span, minZ: -100 - 13 - margin, maxZ: -100 + 13 + margin },
+      { minX: -span, maxX: span, minZ: 180 - 15 - margin, maxZ: 180 + 15 + margin },
+      { minX: -span, maxX: span, minZ: -300 - 10 - margin, maxZ: -300 + 10 + margin }
+    ];
+    for (const r of roads) {
+      if (x >= r.minX && x <= r.maxX && z >= r.minZ && z <= r.maxZ) return true;
+    }
+    return false;
+  }
+
+  function randomPoint(minCenter = 60, radius = 10, avoidRoads = false) {
     let x = 0;
     let z = 0;
     let attempts = 0;
 
     do {
-<<<<<<< HEAD
-      x = (Math.random() - 0.5) * 560;
-      z = (Math.random() - 0.5) * 560;
-    } while (Math.hypot(x, z) < minCenter || (avoidRoads && isOnRoad(x, z)));
-=======
       x = (Math.random() - 0.5) * CONFIG.SPAWN_LIMITS.WORLD_RANGE;
       z = (Math.random() - 0.5) * CONFIG.SPAWN_LIMITS.WORLD_RANGE;
       attempts++;
-    } while ((Math.hypot(x, z) < minCenter || isColliding(x, z, radius)) && attempts < 100);
->>>>>>> ed10bdb (v1)
+    } while (
+      (
+        Math.hypot(x, z) < minCenter ||
+        isColliding(x, z, radius) ||
+        (avoidRoads && isOnRoad(x, z))
+      ) &&
+      attempts < 100
+    );
 
     return { x, z };
   }
 
   function spawnTrees(count = 80) {
     for (let i = 0; i < count; i++) {
-<<<<<<< HEAD
-      const p = randomPoint(60, true); // avoid roads
-=======
-      const p = randomPoint(CONFIG.SPAWN_LIMITS.MIN_CENTER, 4);
->>>>>>> ed10bdb (v1)
+      const p = randomPoint(CONFIG.SPAWN_LIMITS.MIN_CENTER, 4, true);
       addObstacle(createTree(p.x, p.z));
     }
   }
