@@ -75,6 +75,8 @@
   <div>GAME OVER</div>
   <div id="finalScoreText">Score: 0</div>
   <button onclick="location.reload()">Restart</button>
+  </div>
+
   <!-- IDLE REMINDER -->
   <div id="idleReminder" style="display:none; position:absolute; top:40%; width:100%; text-align:center; color:rgba(255,255,255,0.8); font-size:24px; font-weight:bold; pointer-events:none; z-index:20; text-shadow:0 2px 4px rgba(0,0,0,0.8);">
     <!-- text injected via js -->
@@ -95,9 +97,7 @@
         <button id="btn-zoom" class="mobile-btn utility-btn">Zoom</button>
         <button id="btn-ally" class="mobile-btn utility-btn">Ally</button>
       </div>
-      <div id="mobile-fire-hint" style="color:rgba(255,255,255,0.7); font-size:12px; margin-top:8px; text-shadow:0 1px 2px #000;">
-        tap to fire enemy directly..
-      </div>
+      <button id="btn-fire" class="mobile-btn fire-btn">FIRE</button>
     </div>
   </div>
 
