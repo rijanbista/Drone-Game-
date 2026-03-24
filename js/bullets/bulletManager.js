@@ -24,9 +24,7 @@ export function createBulletManager(scene) {
   }
 
   function addPopup(text, color) {
-    popups.push(
-      showHit(text, window.innerWidth / 2, window.innerHeight / 2, color)
-    );
+    return;
   }
 
   function updateBullets(delta, enemyManager, gameState, drone, world = null) {

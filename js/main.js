@@ -181,7 +181,6 @@ let waveChanging = false;
 let waveCooldownLeft = 0;
 let waveCompleted = 0;
 let jammerFlashTimer = 0;
-let mobileTapHintDismissed = false;
 
 function triggerGameOver() {
   gameState.gameOver = true;
@@ -259,37 +258,6 @@ function getMouseGroundPoint() {
   return hit ? point : null;
 }
 
-function getMouseEnemyPoint() {
-  const raycaster = new THREE.Raycaster();
-  raycaster.setFromCamera(
-    new THREE.Vector2(gameState.mouse.x, gameState.mouse.y),
-    sceneData.camera
-  );
-
-  const meshes = [];
-  for (const enemy of enemyManager.enemies) {
-    if (enemy && enemy.mesh) meshes.push(enemy.mesh);
-  }
-  if (meshes.length === 0) return null;
-
-  const hits = raycaster.intersectObjects(meshes, true);
-  if (!hits || hits.length === 0) return null;
-
-  let node = hits[0].object;
-  while (node) {
-    for (const enemy of enemyManager.enemies) {
-      if (enemy && enemy.mesh === node) {
-        const p = enemy.mesh.position.clone();
-        if (!enemy.air) p.y = 0;
-        return p;
-      }
-    }
-    node = node.parent;
-  }
-
-  return null;
-}
-
 startWave(1);
 gameState.allyUsedThisWave = false;
 
@@ -317,7 +285,6 @@ window.addEventListener("keydown", (e) => {
 
 function fireWeapon(targetPoint = null) {
   initAudio();
-  if (isTouch) mobileTapHintDismissed = true;
 
   const weapon = gameState.weaponSystem.current;
   const config = gameState.weaponSystem.ammo[weapon];
@@ -368,36 +335,12 @@ window.addEventListener("mousedown", (e) => {
 
 // Mobile Tap-to-fire (on main game area)
 window.addEventListener("touchstart", (e) => {
-  if (
-    e.target.tagName === "BUTTON" ||
-    e.target.closest("#joystick-zone") ||
-    e.target.closest("#ui") ||
-    e.target.closest("#minimap") ||
-    e.target.closest("#main-menu") ||
-    e.target.closest("#pause-screen") ||
-    e.target.closest("#gameOverScreen")
-  ) return;
+  if (e.target.tagName === "BUTTON" || e.target.closest("#joystick-zone")) return;
   
   // Update mouse coords for raycasting
   const touch = e.touches[0];
   gameState.mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
   gameState.mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
-
-  const moving =
-    (gameState.joystick && gameState.joystick.active) ||
-    gameState.keys["w"] || gameState.keys["a"] || gameState.keys["s"] || gameState.keys["d"];
-
-  if (!moving) {
-    const enemyTarget = getMouseEnemyPoint();
-    if (enemyTarget) fireWeapon(enemyTarget);
-    return;
-  }
-
-  const enemyTarget = getMouseEnemyPoint();
-  if (enemyTarget) {
-    fireWeapon(enemyTarget);
-    return;
-  }
 
   const target = getMouseGroundPoint();
   if (target) fireWeapon(target);
@@ -494,23 +437,6 @@ function gameLoop(now) {
   clock.old = now;
 
   updateDrone(drone, gameState, sceneData.camera, delta, world);
-
-  if (isTouch) {
-    const moving =
-      (gameState.joystick && gameState.joystick.active) ||
-      gameState.keys["w"] || gameState.keys["a"] || gameState.keys["s"] || gameState.keys["d"];
-    if (moving) mobileTapHintDismissed = true;
-
-    const idleReminderEl = document.getElementById("idleReminder");
-    if (idleReminderEl) {
-      if (!mobileTapHintDismissed && !moving) {
-        idleReminderEl.style.display = "block";
-        idleReminderEl.textContent = "Tap Enemy to fire";
-      } else {
-        idleReminderEl.style.display = "none";
-      }
-    }
-  }
   
   // Weapon reload logic
   if (gameState.weaponSystem.isReloading) {
