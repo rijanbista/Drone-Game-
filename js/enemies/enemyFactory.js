@@ -20,6 +20,9 @@ export function createEnemy(type, x, z, wave = 1, difficultyMultiplier = 1.0) {
     throw new Error(`Unknown enemy type: ${type}`);
   }
 
+  if (typeof enemy.health !== "number") enemy.health = 1;
+  if (typeof enemy.maxHealth !== "number") enemy.maxHealth = enemy.health;
+
   // Apply difficulty and wave scaling
   const baseScale = difficultyMultiplier;
   const waveScale = 1 + (wave - 1) * 0.15;
